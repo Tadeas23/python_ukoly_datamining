@@ -1,32 +1,24 @@
 import pandas as pd
-import matplotlib.pyplot as plt
 
-# Načtení CSV souboru
-df = pd.read_csv("ockovani-demografie.csv", delimiter=",")
+# Načtení dat
+file_path = "ockovani-demografie.csv"  # soubor dej do stejné složky, kde máš skript
+df = pd.read_csv(file_path)
 
-# Filtrování jen na 2. dávku
-df_filtered = df[df["poradi_davky"] == 2]
+# Filtrování na základní očkování (2 dávky)
+df_2davky = df[df["poradi_davky"] == 2]
 
-# Sečtení podle pohlaví (absolutní počty)
-counts = df_filtered["pohlavi"].value_counts()
+# Agregace podle pohlaví
+agg = df_2davky.groupby("pohlavi")["pocet_davek"].sum()
 
-# Procenta (na 2 desetinná místa)
-percentages = df_filtered["pohlavi"].value_counts(normalize=True) * 100
+# Přepočet na procenta
+percenta = agg / agg.sum() * 100
 
-# Vypsání do konzole
-for gender in counts.index:
-    print(f"{gender}: {counts[gender]} ({percentages[gender]:.2f} %)")
-
-# Vykreslení koláčového grafu
-if not counts.empty:
-    plt.figure(figsize=(8, 8))
-    plt.pie(
-        counts,
-        labels=counts.index,
-        autopct=lambda pct: f"{pct:.2f}%",
-        startangle=90
-    )
-    plt.title("Zastoupení mužů a žen u 2. dávky očkování")
-    plt.show()
-else:
-    print("Žádná data pro vybranou dávku")
+# Výpis do konzole
+print("Procenta ze základního očkování (2 dávky):")
+for pohlavi, hodnota in percenta.items():
+    if pohlavi == "M":
+        print(f"Muži: {hodnota:.2f} %")
+    elif pohlavi == "Z":
+        print(f"Ženy: {hodnota:.2f} %")
+    else:
+        print(f"Ostatní ({pohlavi}): {hodnota:.2f} %")
