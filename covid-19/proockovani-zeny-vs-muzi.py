@@ -7,18 +7,18 @@ df = pd.read_csv(file_path)
 # Filtrování na základní očkování (2 dávky)
 df_2davky = df[df["poradi_davky"] == 2]
 
-# Agregace podle pohlaví
+# Agregace podle pohlaví (součet počtů dávek)
 agg = df_2davky.groupby("pohlavi")["pocet_davek"].sum()
 
 # Přepočet na procenta
 percenta = agg / agg.sum() * 100
 
 # Výpis do konzole
-print("Procenta ze základního očkování (2 dávky):")
-for pohlavi, hodnota in percenta.items():
+print("Základní očkování (2 dávky):")
+for pohlavi, pocet in agg.items():
     if pohlavi == "M":
-        print(f"Muži: {hodnota:.2f} %")
+        print(f"Muži: {pocet:,} osob ({percenta[pohlavi]:.2f} %)")
     elif pohlavi == "Z":
-        print(f"Ženy: {hodnota:.2f} %")
+        print(f"Ženy: {pocet:,} osob ({percenta[pohlavi]:.2f} %)")
     else:
-        print(f"Ostatní ({pohlavi}): {hodnota:.2f} %")
+        print(f"Ostatní ({pohlavi}): {pocet:,} osob ({percenta[pohlavi]:.2f} %)")
